@@ -1,0 +1,559 @@
+﻿    @using System.Threading
+@model IEnumerable<FirstProject.Models.BossViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" charset=utf-8/>
+    <link type="text/css" href="~/Content/Site.css" rel="stylesheet" />
+    <title>Index</title>
+
+</head>
+<script type="text/javascript">
+
+    function sort(line) {
+        console.log('in sort');
+        for (var i = 0; i < line.length; i++) {
+            for (var j = 0; j < line.length - 1; j++) {
+                var elem1 = line[j];
+                var elem2 = line[j + 1];
+                var res_raw1 = elem1.getElementsByClassName('res_time')[0];
+                var res_raw2 = elem2.getElementsByClassName('res_time')[0];
+                const [fall_hours1, fall_min1, fall_sec1] = res_raw1.innerText.split('.').map(item => +item);
+                const [fall_hours2, fall_min2, fall_sec2] = res_raw2.innerText.split('.').map(item => +item);
+                if ((((((fall_hours1 * 60) + fall_min1) * 60) + fall_sec1) * 1000) >
+                    (((((fall_hours2 * 60) + fall_min2) * 60) + fall_sec2) * 1000)) {
+                    line[j] = elem2;
+                    line[j + 1] = elem1;
+
+                }
+            }
+        }
+        return line;
+    }
+
+    function sortTable() {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("t1");
+        switching = true;
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.getElementsByTagName("TR");
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                x = rows[i].getElementsByTagName("TD")[3];
+                y = rows[i + 1].getElementsByTagName("TD")[3];
+                //check if the two rows should switch place:
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    //if so, mark as a switch and break the loop:
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch
+                and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+
+    function updateRespTime() {
+        var lines = document.getElementsByClassName('line');
+
+        for (const line of lines) {
+            var date_now = new Date(Date.now());
+            date_now.setMinutes(date_now.getMinutes() + date_now.getTimezoneOffset() + 180);
+
+
+
+            var fall_raw = line.getElementsByClassName('fall_time');
+            var resp_from_raw = line.getElementsByClassName('res_time');
+            var resp_in_raw = line.getElementsByClassName('res_time_in');
+            var resp_time = line.getElementsByClassName('resp_time');
+            var cd_count = parseInt(line.getElementsByClassName('cdcount')[0].innerText);
+
+            var [date_fall, time_fall] = fall_raw[0].innerText.split(' ');
+            var [resp_hours, resp_min, resp_sec] = resp_time[0].innerText.split('.');
+            var [fall_hours, fall_min, fall_sec] = time_fall.split('.');
+            var [resp_from_hours, resp_from_min, resp_from_sec] = resp_from_raw[0].innerText.split('.');
+            var [now_year, now_month, now_day, now_hour, now_min, now_sec] = [date_now.getFullYear(), date_now.getMonth(), date_now.getDate(), date_now.getHours(), date_now.getMinutes(), date_now.getSeconds()]
+            var [fall_day, fall_month, fall_year] = date_fall.split('.');
+
+
+
+            var date_fall = new Date(fall_year, fall_month - 1, fall_day, fall_hours, fall_min, fall_sec);
+            var date_left = new Date(fall_year,
+                fall_month - 1,
+                fall_day,
+                resp_from_hours,
+                resp_from_min,
+                resp_from_sec);
+
+
+            var date_in = new Date(date_fall.getTime() +
+                ((resp_hours * 60 + parseInt(resp_min)) * 60 + parseInt(resp_sec)) * 1000 * (cd_count + 1));
+            var [d1, d2] = [
+                new Date(fall_year, fall_month - 1, fall_day),
+                new Date(date_in.getFullYear(), date_in.getMonth(), date_in.getDate())
+            ];
+
+
+
+
+            resp_in_raw[0].innerText = formate_date(date_in);
+
+
+            var res_left = Math.trunc((date_in.getTime() - date_now.getTime()) / 1000);
+
+            if (res_left < 0) {
+                line.getElementsByClassName('cdcount')[0].innerText = cd_count + 1;
+                line.style.background = 'orange';
+            }
+            else if (res_left === 0) {
+                var audio = new Audio(); // Создаём новый элемент Audio
+                audio.src = '/Sounds/res.mp3'; // Указываем путь к звуку "клика"
+                //audio.autoplay = true; // Автоматически запускаем
+                audio.play();
+            }
+            else if (res_left === 2 * 60) {
+                line.style.background = 'greenyellow';
+                var audio = new Audio(); // Создаём новый элемент Audio
+                audio.src = '/Sounds/2min.mp3'; // Указываем путь к звуку "клика"
+                //audio.autoplay = true; // Автоматически запускаем
+                audio.play();
+            }
+            else if (res_left < 2 * 60 && res_left > 0) {
+                line.style.background = 'greenyellow';
+            }
+            console.log(res_left);
+
+            resp_from_raw[0].innerText = get_time(res_left * 1000, '.');
+
+        }
+        sortTable();
+
+    }
+
+
+
+    function formate_date(date) {
+        var [year, month, day, hour, min, sec] = [
+            date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()
+        ];
+
+        var month_str = month < 10 ? '0' + month : month;
+        var day_str = day < 10 ? '0' + day : day;
+        var hour_str = hour < 10 ? '0' + hour : hour;
+        var min_str = min < 10 ? '0' + min : min;
+        var sec_str = sec < 10 ? '0' + sec : sec;
+
+
+        return day_str + '.' + month_str + '.' + year + ' ' + hour_str + '.' + min_str + '.' + sec_str;
+    }
+
+
+
+    function updateRespTime1() {
+        var lines = document.getElementsByClassName('line');
+
+        for (const line of lines) {
+            const fall_raw = line.getElementsByClassName('fall_time')[0].innerText;
+
+
+
+            var res_raw = line.getElementsByClassName('res_time')[0];
+            var resp_raw = line.getElementsByClassName('resp_time')[0].innerText;
+
+
+
+            const [timer_hours, timer_min, timer_sec] = fall_raw.split('.').map(item=>+item);
+            const [fall_hours, fall_min, fall_sec] = res_raw.innerText.split('.').map(item=>+item);
+
+
+            const fall_timestamp = (((((fall_hours * 60) + fall_min) * 60) + fall_sec) * 1000);
+            const last_timestamp = (((((timer_hours * 60) + timer_min) * 60) + timer_sec) * 1000);
+
+            const [hours, minutes, seconds] = resp_raw.split('.').map(item => +item);
+
+            const resp_miliseconds = (((((hours * 60) + minutes) * 60) + seconds) * 1000);
+            var time_now = new Date(Date.now());
+            time_now.setMinutes(time_now.getMinutes() + time_now.getTimezoneOffset() + 180);
+            
+            const in_what_time = last_timestamp + resp_miliseconds * (parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1);
+
+            const result_miliseconds1 = fall_timestamp  * (parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1) - 1000;
+            const result_miliseconds = in_what_time - (((((time_now.getHours() * 60) + time_now.getMinutes()) * 60) + time_now.getSeconds()) * 1000);
+
+            const res_date = get_time(result_miliseconds,".");
+
+
+
+            res_raw.innerText = res_date;
+            line.getElementsByClassName('res_time_in')[0].innerText = get_time(in_what_time, ":");
+
+
+
+            if (result_miliseconds === 0) {
+                //звуковое оповещение
+                var audio = new Audio(); // Создаём новый элемент Audio
+                audio.src = '/Sounds/res.mp3'; // Указываем путь к звуку "клика"
+                //audio.autoplay = true; // Автоматически запускаем
+                audio.play();
+
+            }
+            else if (result_miliseconds < 0) {
+
+                const res = line.getElementsByClassName('fall_time');
+                //res[0].innerText = get_time(in_what_time, ".");
+                var cdc = Math.trunc(result_miliseconds / resp_miliseconds) * -1;
+                console.log(cdc);
+                if (cdc > 0) {
+                    line.getElementsByClassName('cdcount')[0].innerText = cdc;
+                }
+                line.getElementsByClassName('cdcount')[0].innerText = parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1;
+                line.style.background = 'orange';
+            }
+            else if (result_miliseconds === (2 * 60 * 1000) && result_miliseconds > 0) {
+                line.style.background = 'greenyellow';
+                var audio = new Audio(); // Создаём новый элемент Audio
+                audio.src = '/Sounds/2min.mp3'; // Указываем путь к звуку "клика"
+                //audio.autoplay = true; // Автоматически запускаем
+                audio.play();
+            }
+            else if (result_miliseconds < (2 * 60 * 1000 + 1) && result_miliseconds > 0) {
+                line.style.background = 'greenyellow';
+            }
+           
+
+        }
+
+        sortTable();
+    }
+
+    function get_time(milisec,separ) {
+        var time = milisec;
+        var rev = false;
+        if (time<0) {
+            time = time * -1;
+            rev = true;
+        }
+
+        time = time / 1000;
+
+        var h = Math.trunc(time / 3600);
+
+
+
+        time = time - (h *  3600);
+
+        var min = Math.trunc(time / 60);
+
+        time = time - (min * 60);
+
+        var sec = time;
+
+        var calch = (h > 23) ? h - 24 : h;
+        var minstr = (min < 10) ? "0" + min : min;
+        var hstr = (calch < 10) ? "0" + calch : calch;
+        var secstr = (sec < 10) ? "0" + sec : sec;
+        var minus_str = (rev) ? "-" : "";
+        return minus_str + hstr + separ + minstr + separ + secstr;
+    }
+
+    function vison(elem_id) {
+        var getelem_id = document.getElementById(elem_id);
+
+        //getelem_id.getElementsByClassName('text_to_set_time')[0].style.display = 'block';
+        //getelem_id.getElementsByClassName('text_to_set_time')[0].value = "";
+        //getelem_id.getElementsByClassName('button_set_time_conf')[0].style.display = 'block';
+        //getelem_id.getElementsByClassName('button_set_time_cancel')[0].style.display = 'block';
+    }
+
+    function canceltime(elem_id) {
+        var getelem_id = document.getElementById(elem_id);
+        console.log(getelem_id);
+        //getelem_id.getElementsByClassName('text_to_set_time')[0].style.display = 'none';
+        //getelem_id.getElementsByClassName('button_set_time_conf')[0].style.display = 'none';
+        //getelem_id.getElementsByClassName('button_set_time_cancel')[0].style.display = 'none';
+    }
+
+    function unvis() {
+        var lines = document.getElementsByClassName('line');
+
+        for (var line of lines) {
+            //var elem1 = line.getElementsByClassName('button_set_time_cancel');
+            //var elem2 = line.getElementsByClassName('text_to_set_time');
+            //var elem3 = line.getElementsByClassName('button_set_time_conf');
+
+            //elem2[0].style.display = 'none';
+            //elem3[0].style.display = 'none';
+            //elem1[0].style.display = 'none';
+        }
+    }
+
+    function set_custom_time(elem_id) {
+        var getelem_id = document.getElementById(elem_id);
+        getelem_id.getElementsByClassName('fall_time')[0].innerText =
+            getelem_id.getElementsByClassName('text_to_set_time')[0].value;
+        getelem_id.getElementsByClassName('cdcount')[0].innerText = 0;
+        console.log(getelem_id.getElementsByClassName('fall_time')[0].innerText);
+        console.log(getelem_id.getElementsByClassName('text_to_set_time').value);
+        console.log(getelem_id.getElementsByClassName('text_to_set_time')[0].value);
+        var model = @Html.Raw(Json.Encode(Model));
+        console.log(model);
+        var id_f = elem_id.slice(elem_id.indexOf('{') + 1, elem_id.indexOf('}'));
+
+
+        const lines = document.getElementsByClassName('line');
+        var i = 0;
+        for (const line of lines) {
+            if (line.contains(document.getElementById(elem_id))) {
+                console.log('yes');
+                continue;
+
+            }
+            i = i + 1;
+        }
+        console.log(model[parseInt(id_f)]);
+
+        console.log(model[i]);
+
+
+
+        unvis();
+    }
+
+    function foo() {
+        return '1';
+    }
+
+
+    function init() {
+        unvis();
+        setInterval(updateRespTime, 1000);
+
+    }
+
+    function SetNow(elem_id) {
+
+        var getelem_id = document.getElementById(elem_id);
+        console.log(getelem_id);
+        var now_t = new Date(Date.now());
+        now_t.setMinutes(now_t.getMinutes() + now_t.getTimezoneOffset() + 180);
+        var res = (((((now_t.getHours() * 60) + now_t.getMinutes()) * 60) + now_t.getSeconds()) * 1000);
+        getelem_id.getElementsByClassName('fall_time')[0].innerText = get_time(res, ".");
+        getelem_id.getElementsByClassName('cdcount')[0].innerText = 0;
+        const lines = document.getElementsByClassName('line');
+
+    }
+</script>
+
+<style>
+
+tr,th,td{
+
+    border: 2px groove white;
+justify-content: center;
+align-items: center;
+}
+th{
+    
+    font-size: 20px;
+    font-family: sans-serif;
+}
+.buttons{
+  text-decoration: none;
+  outline: none;
+  display: inline-block;
+  width: 140px;
+  height: 45px;
+  line-height: 45px;
+  border: 1px solid white;
+  border-radius: 45px;
+  margin: 10px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 3px;
+  font-weight: 600;
+  color: white;
+  background: white;
+  box-shadow: 0 8px 15px black;
+  transition: .3s;
+}
+.buttons:hover {
+     background: #2EE59D;
+  box-shadow: 0 15px 20px rgba(46,229,157,.4);
+  color: white;
+  transform: translateY(-7px);
+}
+.button_set_time{
+    color: black;
+    text-decoration:none;
+    text-align: center;
+    font-size: 10px;
+    margin-bottom:0;
+    line-height: 0;
+}
+.button_set_now{
+    color: black;
+    text-decoration:none;
+    text-align:center;
+    font-size: 10px;
+    margin-bottom:0;
+    line-height: 0;
+}
+.button_set_now:hover,.button_set_time:hover{
+    text-decoration:none;
+}
+.line{
+    font-size: 26px;
+    text-align: center;
+    vertical-align: middle;
+
+}
+body{
+    background-color: white;
+}
+
+
+
+</style>
+
+    <body onload="init()" class="container-fluid">
+
+    <div class="row-fluid">
+        <div class="col-16" style=" align-items:center;">
+            <table class="table" id="t1">
+                <tbody>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th>
+                        Имя босса
+                    </th>
+                    <th>
+                        Упал
+                    </th>
+                    <th>
+                        Реснется через
+                    </th>
+                    <th>
+                        Реснется в
+                    </th>
+                    <th>
+                        По кд раз
+                    </th>
+                    <th>
+                        Время респа
+                    </th>
+                    <th>
+                        Действия
+                    </th>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <th>
+                            Только для админа
+                        </th>
+                    }
+
+                </tr>
+                @foreach (var item in Model)
+                {
+
+                    <tr class="line" id="line_{@item.Id}" style="background: @item.Color">
+                        <td>
+                            <img src="@string.Format("/Imgs/Портрет_{0}.png",@item.Name.Replace(' ','_'))"/>
+                            
+                        </td>
+                        <td>
+                            @Html.HiddenFor(m => item.Name)
+                            @Html.DisplayFor(modelItem => item.Name)
+                            
+                        </td>
+                        <td class="fall_time">
+                            @Html.DisplayFor(modelItem => item.LastTime)
+                        </td>
+                        <td class="res_time">
+                            @Html.DisplayFor(modelItem => item.KdTime)
+
+                        </td>
+
+                        <td>
+                            <text class="res_time_in"></text>
+                        </td>
+                        <td class="cdcount">
+                            @Html.DisplayFor(modelItem => item.KdCount)
+                        </td>
+
+                        <td class="resp_time">
+                            @Html.DisplayFor(modelItem => item.KdTime)
+                        </td>
+
+
+                        <td>
+                            <div class="row">
+                                <div class="col-sm-7">
+                                    
+                                    <button class="buttons"> @Html.ActionLink("Упал сейчас", "Edit", new {id = item.Id, fl = true}, new {@class = "button_set_now", @id = "button_{@item.Id}", onclick = "SetNow('line_{@item.Id}')"}) </button>
+                                        
+                           
+                                </div>
+                                <div class="col-sm-7">
+                                   
+                                  <button class="buttons">  @Html.ActionLink("Точное время", "Edit", new {id = item.Id, fl = false}, new {@class = "button_set_time", @id = "button_set_time_conf{@item.Id}"}) </button>
+                                </div>
+                            </div>
+                           
+                            <div class="row">
+                                <div class="col-xs-6">
+                                   
+                                </div>
+                            </div>
+
+                        </td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <td>
+                              <button class="buttons">@Html.ActionLink("Изменить", "Edit", new {id = item.Id},new {@class = "button_set_time"})</button>
+                                @*@Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
+                             <button class="buttons">@Html.ActionLink("Удалить", "Delete", new {id = item.Id},new {@class = "button_set_time"})</button>
+                            </td>
+                        }
+                     </tr>
+
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="col-md-4">
+
+                @Html.ActionLink("Добавить", "Create", new {}, new {@class = "button_1596547873487"})
+            </div>
+            <br><br>
+        }
+    </div>
+<br><br>
+    </body>
+
+</html>

@@ -1,0 +1,63 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+.button_1596547873487 {
+    display: inline-block ;
+    text-decoration: none ;
+    background-color: #ffffff ;
+    color: #006089 ;
+    border: 4px solid #006089 ;
+    border-radius: 50px ;
+    font-size: 15px ;
+    padding: 15px 36px ; 
+}
+
+.button_1596547873487:hover {
+    text-decoration: none ;
+}
+
+.buttonClose {
+    background-color: #FF4500;
+    border: none;
+    color: white;
+    
+    padding: 20px 34px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 4px 2px;
+    cursor: pointer;
+    
+}
+
+.fall_time_hid {
+    display: none;
+}
+
+tr {
+    background-color: beige;
+}

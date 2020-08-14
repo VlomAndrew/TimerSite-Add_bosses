@@ -1,0 +1,66 @@
+﻿@using FirstProject.Models;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link type="text/css" href="~/Content/Site.css" rel="stylesheet"/>
+    <title>Index</title>
+</head>
+<body>
+<div>
+
+</div>
+<div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>
+                            Email/Никнейм
+                        </th>
+                        <th>
+                            Роль/Звание
+                        </th>
+                        <th>
+                            Действие
+                        </th>
+                    </tr>
+                    @foreach (var user in ViewBag.users)
+                    {
+                        <tr>
+                            <td>@user.Key</td>
+
+                            <td>@user.Value</td>
+                            <td>
+                                <div class="link" font="latin">
+                                    @Html.ActionLink("Edit", "Edit", new { email = user.Key })
+                                    @Html.ActionLink("Delete", "Delete", new { email = user.Key }
+                                        , new { onclick = "return confirm('Are you sure you wish to delete this article?');" })
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+        <div class="col-md-4">
+            
+                @using (@Html.BeginForm("Create", "ChangeUser", FormMethod.Get))
+                {
+                    <input type="submit" value="Создать нового пользователя" class="button_1596547873487"/>
+                }
+            
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+﻿@using System.Web.WebPages.Html
+@using Microsoft.Ajax.Utilities
+@using SelectListItem = System.Web.Mvc.SelectListItem
+
+<link type="text/css" href="~/Content/Site.css" rel="stylesheet" />
+@using (@Html.BeginForm("Edit", "ChangeUser",FormMethod.Post))
+{
+<div class="modal-content">
+    <div class="modal-header">
+       
+
+        <h4>Информация о пользователе</h4>
+    </div>
+    <div class="modal-body">
+        <p>
+            @Html.Label("Email")
+            <input id="email" type="text" name="email" value="@ViewBag.user.Email" readonly/>
+        </p>
+        <p>
+            @Html.Label("Nickname")
+            <input id="nick" type="text" name="nick" value="@ViewBag.user.UserName"/>
+        </p>
+        <p>
+            @Html.Label("Текущее звание")
+            <input id="role" type="text" name="role" value="@ViewBag.userRole[0]"/>
+            <select id="selectedRoles" onchange="SetNewRole(this)">
+                <option disabled>Выберите роль</option>
+                <option>@ViewBag.roles[0]</option>
+                <option>@ViewBag.roles[1]</option>
+                <option>@ViewBag.roles[2]</option>
+            </select>
+            
+        </p>
+        <p>
+            <script type="text/javascript">
+                function showPas(box) {
+                    var vis = (box.checked) ? "block" : "none";
+                    document.getElementById('pwd').style.display = vis;
+                }
+
+                function SetNewRole(select) {
+                    var i = document.getElementById('selectedRoles');
+                    var roleName = i.options[i.selectedIndex].text;
+                    document.getElementById('role').value = roleName;
+                }
+            </script>
+            <b>Хотите изменить пароль?</b> <input type="checkbox" name =" showPWD" value="0" onclick="showPas(this)"/>
+            <div id="pwd" style="display: block; display: none">
+                @Html.Label("Password")
+                <input type="text" name="pass"/>
+            </div> 
+        
+           
+        </p>
+        <p>
+           
+            
+                <input type="submit" class="button_1596547873487" value="Сохранить изменения"/>
+                <a href="/ChangeUser/Index" class="button_1596547873487">
+                    Оставить как есть
+                </a>
+           
+            
+        </p>
+    </div>
+</div>
+}

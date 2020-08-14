@@ -1,0 +1,58 @@
+﻿@model FirstProject.Models.BossViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Delete</title>
+</head>
+<body>
+    <div class="container">
+    <h3>Вы точно хотите удалить босса?</h3>
+    <div>
+        
+        <hr />
+        <dl class="dl-horizontal" hidden="true">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.KdCount)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.KdCount)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.KdTime)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.KdTime)
+            </dd>
+    
+        </dl>
+    
+        @using (Html.BeginForm()) {
+            @Html.AntiForgeryToken()
+    
+            <div class="form-actions no-color">
+                <input type="submit" value="Да" class="button_1596547873487" /> |
+                @Html.ActionLink("Вернуться назад", "Index")
+            </div>
+        }
+    </div>
+    </div>
+</body>
+</html>
