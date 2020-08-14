@@ -1,7 +1,8 @@
 ﻿    @using System.Threading
 @model IEnumerable<FirstProject.Models.BossViewModel>
 
-@{
+    @{
+        ViewBag.Title = "Таймер";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -11,7 +12,7 @@
 <head>
     <meta name="viewport" content="width=device-width" charset=utf-8/>
     <link type="text/css" href="~/Content/Site.css" rel="stylesheet" />
-    <title>Index</title>
+  
 
 </head>
 <script type="text/javascript">
@@ -128,13 +129,14 @@
 
             var res_left = Math.trunc((date_in.getTime() - date_now.getTime()) / 1000);
 
-            if (res_left < 0) {
+            if (res_left <  -600) {
                 line.getElementsByClassName('cdcount')[0].innerText = cd_count + 1;
                 line.style.background = 'orange';
             }
+            
             else if (res_left === 0) {
                 var check = document.getElementById("checkbox");
-                if (check.checked) {
+                if (!check.checked) {
                 var audio = new Audio(); // Создаём новый элемент Audio
                 audio.src = '/Sounds/res.mp3'; // Указываем путь к звуку "клика"
                 //audio.autoplay = true; // Автоматически запускаем
@@ -144,14 +146,14 @@
             else if (res_left === 3 * 60) {
                 line.style.background = 'greenyellow';
                 var check = document.getElementById("checkbox");
-                if (check.checked) {
+                if (!check.checked) {
                 var audio = new Audio(); // Создаём новый элемент Audio
                 audio.src = '/Sounds/2min.mp3'; // Указываем путь к звуку "клика"
                 //audio.autoplay = true; // Автоматически запускаем
                 audio.play();
                 }
             }
-            else if (res_left < 2 * 60 && res_left > 0) {
+            else if (res_left < 2 * 60) {
                 line.style.background = 'greenyellow';
             }
             console.log(res_left);
@@ -230,7 +232,7 @@
                 audio.play();
 
             }
-            else if (result_miliseconds < 0) {
+            else if (result_miliseconds < 0 && result_miliseconds) {
 
                 const res = line.getElementsByClassName('fall_time');
                 //res[0].innerText = get_time(in_what_time, ".");
@@ -258,6 +260,8 @@
 
         sortTable();
     }
+
+
 
     function get_time(milisec,separ) {
         var time = milisec;
@@ -320,6 +324,8 @@
         }
     }
 
+    var f = setTimeout("location.reload(true);",600000);
+
     function set_custom_time(elem_id) {
         var getelem_id = document.getElementById(elem_id);
         getelem_id.getElementsByClassName('fall_time')[0].innerText =
@@ -353,15 +359,13 @@
     }
 
     function foo() {
-        return '1';
+        setTimeout(window.location.reload(), 600000);
     }
 
 
     function init() {
         unvis();
         setInterval(updateRespTime, 1000);
-        setInterval(location.reload(), 600000);
-        
 
     }
 
@@ -404,7 +408,7 @@
         width: 50px;
         height: 26px;
         border-radius: 13px;
-        background: #CDD1DA;
+        background: green;
         box-shadow: inset 0 2px 3px rgba(0,0,0,.2);
         transition: .2s;
     }
@@ -421,7 +425,7 @@
         transition: .2s;
     }
     .checkbox:checked + label:before {
-        background: #9FD468;
+        background: red;
     }
     .checkbox:checked + label:after {
         left: 26px;
@@ -470,7 +474,11 @@ th{
             color: white;
             transform: translateY(-7px);
         }
-/*.button_set_time{
+    #time_to_res_id{
+        color: crimson;
+    }
+    
+    /*.button_set_time{
     color: black;
     text-decoration:none;
     text-align: center;
@@ -489,12 +497,11 @@ th{
 .button_set_now:hover,.button_set_time:hover{
     text-decoration:none;
 }*/
-.line{
-    font-size: 26px;
-    text-align: center;
-    vertical-align: middle;
-
-}
+    .line {
+        font-size: 26px;
+        text-align: center;
+        vertical-align: middle;
+    }
 body{
     background-color: white;
 }
@@ -503,7 +510,7 @@ body{
 
 </style>
 
-    <body onload="init()" class="container-fluid">
+    <body onload="init()"  class="container-fluid">
 
     <div class="row-fluid">
         <div class="col-16" style=" align-items:center;">
@@ -519,7 +526,7 @@ body{
                     <th>
                         Упал
                     </th>
-                    <th>
+                    <th id="time_to_res_id">
                         Реснется через
                     </th>
                     <th>
@@ -558,7 +565,7 @@ body{
                         <td class="fall_time">
                             @Html.DisplayFor(modelItem => item.LastTime)
                         </td>
-                        <td class="res_time">
+                        <td class="res_time" id="time_to_res_id">
                             @Html.DisplayFor(modelItem => item.KdTime)
 
                         </td>

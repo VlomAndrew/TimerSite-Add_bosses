@@ -59,13 +59,14 @@ namespace FirstProject.Controllers
                 var time_str = string.Format("{0}.{1}.{2}", dtnow.Hour < 10 ? "0" + dtnow.Hour.ToString() : dtnow.Hour.ToString()
                     , dtnow.Minute < 10 ? "0" + dtnow.Minute.ToString() : dtnow.Minute.ToString()
                     , dtnow.Second < 10 ? "0" + dtnow.Second.ToString() : dtnow.Second.ToString());
-                bossViewModel.LastTime = dtnow.ToString();
+                var res = string.Format("{0}.{1}.{2} {3}:{4}:{5}", dtnow.Day, dtnow.Month, dtnow.Year, dtnow.Hour, dtnow.Minute, dtnow.Second);
+                bossViewModel.LastTime = res;
                 bossViewModel.KdTime = bossViewModel.KdTime.Replace(':', '.').Replace(',', '.').Replace(' ', '.');
                 db.BossViewModels.Add(bossViewModel);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            Response.Redirect(Request.RawUrl);
+           
             return View(bossViewModel);
         }
 
@@ -103,20 +104,26 @@ namespace FirstProject.Controllers
                 TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
                 DateTime dtnow = TimeZoneInfo.ConvertTimeFromUtc(dtnow_now, moscowTimeZone);
 
-                var mass_mow = dtnow.ToString().Split(' ');
-                if (fl) 
-                    bossViewModel.LastTime = mass_mow[0] + ' ' + mass_mow[1].Replace('.', ':').Replace(',', ':').Replace('-', ':')
-                        .Replace(' ', ':');
-                var mass = bossViewModel.LastTime.Split(' ');
-                var str = string.Empty;
-                for (int i = 1; i < mass.Length; i++)
+                
+                if (fl)
                 {
-                    str += mass[i] + ' ';
+                    var res = string.Format("{0}.{1}.{2} {3}:{4}:{5}", dtnow.Day, dtnow.Month, dtnow.Year, dtnow.Hour, dtnow.Minute, dtnow.Second);
+                    bossViewModel.LastTime = res;
+                }
+                else
+                {
+                    var mass = bossViewModel.LastTime.Split(' ');
+                    var str = string.Empty;
+                    for (int i = 1; i < mass.Length; i++)
+                    {
+                        str += mass[i] + ' ';
+                    }
+
+                    str = str.Remove(str.Length - 1);
+                    bossViewModel.LastTime = mass[0] + ' ' + str.Replace('.', ':').Replace(',', ':').Replace('-', ':')
+                        .Replace(' ', ':');
                 }
 
-                str = str.Remove(str.Length-1);
-                bossViewModel.LastTime = mass[0] + ' ' + str.Replace('.', ':').Replace(',', ':').Replace('-', ':')
-                    .Replace(' ', ':');
                 db.Entry(bossViewModel).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
