@@ -73,6 +73,12 @@
     }
 
 
+    function changeCheck_box() {
+        var cb = document.getElementById("checkbox");
+
+    }
+
+
     function updateRespTime() {
         var lines = document.getElementsByClassName('line');
 
@@ -90,8 +96,8 @@
 
             var [date_fall, time_fall] = fall_raw[0].innerText.split(' ');
             var [resp_hours, resp_min, resp_sec] = resp_time[0].innerText.split('.');
-            var [fall_hours, fall_min, fall_sec] = time_fall.split('.');
-            var [resp_from_hours, resp_from_min, resp_from_sec] = resp_from_raw[0].innerText.split('.');
+            var [fall_hours, fall_min, fall_sec] = time_fall.split(':');
+            var [resp_from_hours, resp_from_min, resp_from_sec] = resp_from_raw[0].innerText.split(':');
             var [now_year, now_month, now_day, now_hour, now_min, now_sec] = [date_now.getFullYear(), date_now.getMonth(), date_now.getDate(), date_now.getHours(), date_now.getMinutes(), date_now.getSeconds()]
             var [fall_day, fall_month, fall_year] = date_fall.split('.');
 
@@ -116,6 +122,7 @@
 
 
 
+
             resp_in_raw[0].innerText = formate_date(date_in);
 
 
@@ -126,24 +133,30 @@
                 line.style.background = 'orange';
             }
             else if (res_left === 0) {
+                var check = document.getElementById("checkbox");
+                if (check.checked) {
                 var audio = new Audio(); // Создаём новый элемент Audio
                 audio.src = '/Sounds/res.mp3'; // Указываем путь к звуку "клика"
                 //audio.autoplay = true; // Автоматически запускаем
                 audio.play();
+                }
             }
-            else if (res_left === 2 * 60) {
+            else if (res_left === 3 * 60) {
                 line.style.background = 'greenyellow';
+                var check = document.getElementById("checkbox");
+                if (check.checked) {
                 var audio = new Audio(); // Создаём новый элемент Audio
                 audio.src = '/Sounds/2min.mp3'; // Указываем путь к звуку "клика"
                 //audio.autoplay = true; // Автоматически запускаем
                 audio.play();
+                }
             }
             else if (res_left < 2 * 60 && res_left > 0) {
                 line.style.background = 'greenyellow';
             }
             console.log(res_left);
 
-            resp_from_raw[0].innerText = get_time(res_left * 1000, '.');
+            resp_from_raw[0].innerText = get_time(res_left * 1000, ':');
 
         }
         sortTable();
@@ -164,7 +177,7 @@
         var sec_str = sec < 10 ? '0' + sec : sec;
 
 
-        return day_str + '.' + month_str + '.' + year + ' ' + hour_str + '.' + min_str + '.' + sec_str;
+        return day_str + '.' + month_str + '.' + year + ' ' + hour_str + ':' + min_str + ':' + sec_str;
     }
 
 
@@ -194,7 +207,7 @@
             const resp_miliseconds = (((((hours * 60) + minutes) * 60) + seconds) * 1000);
             var time_now = new Date(Date.now());
             time_now.setMinutes(time_now.getMinutes() + time_now.getTimezoneOffset() + 180);
-            
+
             const in_what_time = last_timestamp + resp_miliseconds * (parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1);
 
             const result_miliseconds1 = fall_timestamp  * (parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1) - 1000;
@@ -239,7 +252,7 @@
             else if (result_miliseconds < (2 * 60 * 1000 + 1) && result_miliseconds > 0) {
                 line.style.background = 'greenyellow';
             }
-           
+
 
         }
 
@@ -347,6 +360,8 @@
     function init() {
         unvis();
         setInterval(updateRespTime, 1000);
+        setInterval(location.reload(), 600000);
+        
 
     }
 
@@ -366,6 +381,54 @@
 
 <style>
 
+
+    a:hover {
+        text-decoration: none;
+    }
+    .checkbox {
+        position: absolute;
+        z-index: -1;
+        opacity: 0;
+        margin: 10px 0 0 20px;
+    }
+    .checkbox + label {
+        position: relative;
+        padding: 0 0 0 60px;
+        cursor: pointer;
+    }
+    .checkbox + label:before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 0;
+        width: 50px;
+        height: 26px;
+        border-radius: 13px;
+        background: #CDD1DA;
+        box-shadow: inset 0 2px 3px rgba(0,0,0,.2);
+        transition: .2s;
+    }
+    .checkbox + label:after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 2px;
+        width: 22px;
+        height: 22px;
+        border-radius: 10px;
+        background: #FFF;
+        box-shadow: 0 2px 5px rgba(0,0,0,.3);
+        transition: .2s;
+    }
+    .checkbox:checked + label:before {
+        background: #9FD468;
+    }
+    .checkbox:checked + label:after {
+        left: 26px;
+    }
+    .checkbox:focus + label:before {
+        box-shadow: inset 0 2px 3px rgba(0,0,0,.2), 0 0 0 3px rgba(255,255,0,.7);
+    }
 tr,th,td{
 
     border: 2px groove white;
@@ -377,34 +440,37 @@ th{
     font-size: 20px;
     font-family: sans-serif;
 }
-.buttons{
-  text-decoration: none;
-  outline: none;
-  display: inline-block;
-  width: 140px;
-  height: 45px;
-  line-height: 45px;
-  border: 1px solid white;
-  border-radius: 45px;
-  margin: 10px 20px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  text-transform: uppercase;
-  text-align: center;
-  letter-spacing: 3px;
-  font-weight: 600;
-  color: white;
-  background: white;
-  box-shadow: 0 8px 15px black;
-  transition: .3s;
-}
-.buttons:hover {
-     background: #2EE59D;
-  box-shadow: 0 15px 20px rgba(46,229,157,.4);
-  color: white;
-  transform: translateY(-7px);
-}
-.button_set_time{
+    .button_set_now {
+        display: inline-block;
+        text-decoration: none;
+        outline: none;
+        width: 140px;
+        height: 45px;
+        line-height: 45px;
+        border: 1px solid white;
+        border-radius: 45px;
+        margin: 10px 20px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        text-align: center;
+        letter-spacing: 3px;
+        font-weight: 600;
+        color: white;
+        background: white;
+        box-shadow: 0 8px 15px black;
+        transition: .3s;
+        color: black;
+        margin-bottom: 0;
+        line-height: 0;
+    }
+        .button_set_now:hover{
+            background: #2EE59D;
+            box-shadow: 0 15px 20px rgba(46,229,157,.4);
+            color: white;
+            transform: translateY(-7px);
+        }
+/*.button_set_time{
     color: black;
     text-decoration:none;
     text-align: center;
@@ -422,7 +488,7 @@ th{
 }
 .button_set_now:hover,.button_set_time:hover{
     text-decoration:none;
-}
+}*/
 .line{
     font-size: 26px;
     text-align: center;
@@ -513,13 +579,18 @@ body{
                             <div class="row">
                                 <div class="col-sm-7">
                                     
-                                    <button class="buttons"> @Html.ActionLink("Упал сейчас", "Edit", new {id = item.Id, fl = true}, new {@class = "button_set_now", @id = "button_{@item.Id}", onclick = "SetNow('line_{@item.Id}')"}) </button>
+                                    <a href="@Url.Action("Edit", "BossViewModels", new {id = item.Id, fl = true})"  class="button_1596547873487">Упал сейчас
+                                       @* <input type="button" class="button_set_time" value="Упал сейчас"/>*@
+                                    </a>
+                                    @*@Html.ActionLink("Упал сейчас", "Edit", new {id = item.Id, fl = true}, new {@class = "button_set_now", @id = "button_{@item.Id}", onclick = "SetNow('line_{@item.Id}')"})*@ 
                                         
                            
                                 </div>
                                 <div class="col-sm-7">
-                                   
-                                  <button class="buttons">  @Html.ActionLink("Точное время", "Edit", new {id = item.Id, fl = false}, new {@class = "button_set_time", @id = "button_set_time_conf{@item.Id}"}) </button>
+                                    <a href="@Url.Action("Edit", "BossViewModels", new {id = item.Id, fl = false})" class="button_1596547873487">Точное время
+                                        @*<input type="button" class="button_1596547873487" value="Точное время"/>*@
+                                    </a>
+                                    @*@Html.ActionLink("Точное время", "Edit", new { id = item.Id, fl = false }, new { @class = "button_set_time", @id = "button_set_time_conf{@item.Id}" })*@
                                 </div>
                             </div>
                            
@@ -530,19 +601,28 @@ body{
                             </div>
 
                         </td>
+                       
                         @if (User.IsInRole("Admin"))
                         {
                             <td>
-                              <button class="buttons">@Html.ActionLink("Изменить", "Edit", new {id = item.Id},new {@class = "button_set_time"})</button>
+                                <a href="@Url.Action("Edit", "BossViewModels", new {id = item.Id})"  class="button_1596547873487">Изменить
+                                    @* <input type="button" class="button_set_time" value="Упал сейчас"/>*@
+                                </a>
+                                @*<button class="buttons">@Html.ActionLink("Изменить", "Edit", new {id = item.Id}, new {@class = "button_set_time"})</button>*@
                                 @*@Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
-                             <button class="buttons">@Html.ActionLink("Удалить", "Delete", new {id = item.Id},new {@class = "button_set_time"})</button>
+                                @*<button class="buttons">@Html.ActionLink("Удалить", "Delete", new {id = item.Id}, new {@class = "button_set_time"})</button>*@
+                                <a href="@Url.Action("Delete", "BossViewModels", new {id = item.Id})"  class="button_1596547873487">Удалить
+                                    @* <input type="button" class="button_set_time" value="Упал сейчас"/>*@
+                                </a>
                             </td>
                         }
-                     </tr>
+                    </tr>
 
                 }
                 </tbody>
             </table>
+            <input type="checkbox" class="checkbox" id="checkbox" onclick="changeCheck_box()"/>
+            <label for="checkbox">Звуковые оповещения</label>
         </div>
         @if (User.IsInRole("Admin"))
         {
