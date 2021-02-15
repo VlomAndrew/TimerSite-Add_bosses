@@ -76,7 +76,20 @@ namespace FirstProject.Controllers
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            var user = userManager.FindByEmail(model.Email);
+            ApplicationUser user = null;
+            try
+            {
+                user = userManager.FindByEmail(model.Email);
+            }
+            catch (Exception e)
+            {
+                return RedirectToAction("ErrorRegisterView");
+            }
+
+            if (user == null)
+            {
+                return RedirectToAction("ErrorRegisterView");
+            }
             
             var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
@@ -202,6 +215,11 @@ namespace FirstProject.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        public ActionResult ErrorRegisterView()
+        {
+            return View();
+        }
         //
         // POST: /Account/ForgotPassword
         [HttpPost]
@@ -396,9 +414,16 @@ namespace FirstProject.Controllers
 
         //
         // POST: /Account/LogOff
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
+        {
+            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult LogOffProg()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");

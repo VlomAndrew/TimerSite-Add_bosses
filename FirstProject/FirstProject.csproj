@@ -280,10 +280,15 @@
     <Compile Include="BossContextMigrations\202008112058055_add-color.Designer.cs">
       <DependentUpon>202008112058055_add-color.cs</DependentUpon>
     </Compile>
+    <Compile Include="BossContextMigrations\202102151112230_AddHist.cs" />
+    <Compile Include="BossContextMigrations\202102151112230_AddHist.Designer.cs">
+      <DependentUpon>202102151112230_AddHist.cs</DependentUpon>
+    </Compile>
     <Compile Include="BossContextMigrations\Configuration.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BossViewModelsController.cs" />
     <Compile Include="Controllers\ChangeUserController.cs" />
+    <Compile Include="Controllers\HistoryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\TimerController.cs" />
@@ -310,6 +315,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BoosViewModels.cs" />
+    <Compile Include="Models\HistoryModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -327,6 +333,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Properties\PublishProfiles\FTPProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\FTPProfile1.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -386,6 +393,8 @@
     <Content Include="Views\BossViewModels\Edit1.cshtml" />
     <Content Include="Views\BossViewModels\Index.cshtml" />
     <Content Include="Views\BossViewModels\Edit.cshtml" />
+    <Content Include="Views\Account\ErrorRegisterView.cshtml" />
+    <Content Include="Views\History\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -422,6 +431,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BossContextMigrations\202008112058055_add-color.resx">
       <DependentUpon>202008112058055_add-color.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BossContextMigrations\202102151112230_AddHist.resx">
+      <DependentUpon>202102151112230_AddHist.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202007302222507_InitialCreate.resx">
       <DependentUpon>202007302222507_InitialCreate.cs</DependentUpon>

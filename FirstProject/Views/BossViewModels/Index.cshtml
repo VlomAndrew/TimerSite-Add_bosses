@@ -129,8 +129,13 @@
 
             var res_left = Math.trunc((date_in.getTime() - date_now.getTime()) / 1000);
 
-            if (res_left <  -600) {
-                line.getElementsByClassName('cdcount')[0].innerText = cd_count + 1;
+            if (res_left < -600) {
+                var t_r = ((resp_hours * 60 + parseInt(resp_min)) * 60 + parseInt(resp_sec)) * 1000;
+                console.log("time_res[ " + t_r);
+                console.log("left" + res_left);
+                var cdc = Math.trunc(res_left * -1000 / t_r);
+                console.log("asdeeasd" + cdc);
+                line.getElementsByClassName('cdcount')[0].innerText = cdc+1;
                 line.style.background = 'orange';
             }
             
@@ -232,16 +237,16 @@
                 audio.play();
 
             }
-            else if (result_miliseconds < 0 && result_miliseconds) {
+            else if (result_miliseconds < 0 ) {
 
                 const res = line.getElementsByClassName('fall_time');
                 //res[0].innerText = get_time(in_what_time, ".");
-                var cdc = Math.trunc(result_miliseconds / resp_miliseconds) * -1;
-                console.log(cdc);
+                var cdc = Math.trunc((result_miliseconds*-1) / resp_miliseconds);
+                console.log("кд коунт"+cdc);
                 if (cdc > 0) {
-                    line.getElementsByClassName('cdcount')[0].innerText = cdc;
+                    line.getElementsByClassName('cdcount')[0].innerText = parseint(cdc);
                 }
-                line.getElementsByClassName('cdcount')[0].innerText = parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1;
+                else line.getElementsByClassName('cdcount')[0].innerText = parseInt(line.getElementsByClassName('cdcount')[0].innerText) + 1;
                 line.style.background = 'orange';
             }
             else if (result_miliseconds === (2 * 60 * 1000) && result_miliseconds > 0) {
@@ -581,13 +586,13 @@ body{
                             @Html.DisplayFor(modelItem => item.KdTime)
                         </td>
 
-
+                        @if (User.IsInRole("Oficer")||User.IsInRole("Admin")){
                         <td>
                             <div class="row">
                                 <div class="col-sm-7">
                                     
                                     <a href="@Url.Action("Edit", "BossViewModels", new {id = item.Id, fl = true})"  class="button_1596547873487">Упал сейчас
-                                       @* <input type="button" class="button_set_time" value="Упал сейчас"/>*@
+                                        @* <input type="button" class="button_set_time" value="Упал сейчас"/>*@
                                     </a>
                                     @*@Html.ActionLink("Упал сейчас", "Edit", new {id = item.Id, fl = true}, new {@class = "button_set_now", @id = "button_{@item.Id}", onclick = "SetNow('line_{@item.Id}')"})*@ 
                                         
@@ -608,6 +613,7 @@ body{
                             </div>
 
                         </td>
+                        }
                        
                         @if (User.IsInRole("Admin"))
                         {

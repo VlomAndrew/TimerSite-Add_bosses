@@ -18,9 +18,10 @@ namespace FirstProject.Controllers
     public class ChangeUserController : Controller
     {
         // GET: ChangeUser
-       
+        [Authorize]
         public ActionResult Index()
         {
+
             var uc = new ApplicationDbContext();
             var userList = uc.Users.ToList();
             ApplicationUserManager userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
@@ -127,12 +128,14 @@ namespace FirstProject.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public ActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Create(RegisterViewModel model)
         {
             var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();

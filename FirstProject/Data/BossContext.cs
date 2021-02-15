@@ -1,5 +1,6 @@
 ﻿using FirstProject.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using DbContext = System.Data.Entity.DbContext;
 
 namespace FirstProject.Data
@@ -17,6 +18,7 @@ namespace FirstProject.Data
             
         }
         public DbSet<BossViewModel> Bosses { get; set; }
+        public System.Data.Entity.DbSet<HistoryModel> History { get; set; }
 
         public System.Data.Entity.DbSet<FirstProject.Models.BossViewModel> BossViewModels { get; set; }
     }

@@ -16,7 +16,16 @@ namespace FirstProject.Controllers
         public ActionResult Index()
         {
             ApplicationUserManager userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            var user = userManager.FindByEmail(User.Identity.Name);
+            ApplicationUser user = null;
+            user = userManager.FindByName(User.Identity.Name);
+            if (User.Identity.IsAuthenticated)
+            {
+                if (user == null)
+                {
+                    return RedirectToAction("LogOffProg", "Account");
+                }
+            }
+
             if (user != null)
             {
                 var role = userManager.GetRoles(user.Id);
@@ -32,6 +41,16 @@ namespace FirstProject.Controllers
         [Authorize]
         public ActionResult About()
         {
+            ApplicationUserManager userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            ApplicationUser user = null;
+            user = userManager.FindByName(User.Identity.Name);
+            if (User.Identity.IsAuthenticated)
+            {
+                if (user == null)
+                {
+                    return RedirectToAction("LogOffProg", "Account");
+                }
+            }
             ViewBag.Message = "Your application description page.";
 
             return View();
@@ -41,6 +60,16 @@ namespace FirstProject.Controllers
         [Authorize]
         public ActionResult Contact()
         {
+            ApplicationUserManager userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            ApplicationUser user = null;
+            user = userManager.FindByName(User.Identity.Name);
+            if (User.Identity.IsAuthenticated)
+            {
+                if (user == null)
+                {
+                    return RedirectToAction("LogOffProg", "Account");
+                }
+            }
             ViewBag.Message = "Your contact page.";
 
             return View();

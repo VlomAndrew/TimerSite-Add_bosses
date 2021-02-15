@@ -30,6 +30,7 @@
                     @if (User.IsInRole("Oficer") || User.IsInRole("Admin"))
                     {
                         <li>@Html.ActionLink("Таймер", "Index", "BossViewModels")</li>
+                                                                                 <li>@Html.ActionLink("История","Index","History")</li>
                     }
                     @if (User.IsInRole("Admin"))
                     {

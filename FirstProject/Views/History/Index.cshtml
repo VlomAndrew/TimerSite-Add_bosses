@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>История</h2>
+<table>
+    @foreach (var item in @ViewBag.Hist)
+    {
+        <tr><td>@item.ToString()</td></tr>
+    }
+
+</table>
+

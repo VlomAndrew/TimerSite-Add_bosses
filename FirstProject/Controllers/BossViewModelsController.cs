@@ -10,6 +10,8 @@ using System.Web.UI;
 using System.Windows.Forms.VisualStyles;
 using FirstProject.Data;
 using FirstProject.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace FirstProject.Controllers
 {
@@ -18,8 +20,19 @@ namespace FirstProject.Controllers
         private BossContext db = new BossContext();
 
         // GET: BossViewModels
+        [Authorize]
         public ActionResult Index()
         {
+            ApplicationUserManager userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            ApplicationUser user = null;
+            user = userManager.FindByName(User.Identity.Name);
+            if (User.Identity.IsAuthenticated)
+            {
+                if (user == null)
+                {
+                    return RedirectToAction("LogOffProg", "Account");
+                }
+            }
             return View(db.BossViewModels.ToList());
         }
 
@@ -96,19 +109,22 @@ namespace FirstProject.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Name,KdCount,KdTime,LastTime")] BossViewModel bossViewModel,bool fl = false)
+        public ActionResult Edit([Bind(Include = "Id,Name,KdCount,KdTime,LastTime,Color")] BossViewModel bossViewModel,bool fl = false)
         {
             if (ModelState.IsValid)
             {
                 var dtnow_now = DateTime.Now.ToUniversalTime(); 
                 TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
                 DateTime dtnow = TimeZoneInfo.ConvertTimeFromUtc(dtnow_now, moscowTimeZone);
-
+                HistoryModel hist = new HistoryModel();
+                hist.Name = User.Identity.Name;
+                
                 
                 if (fl)
                 {
                     var res = string.Format("{0}.{1}.{2} {3}:{4}:{5}", dtnow.Day, dtnow.Month, dtnow.Year, dtnow.Hour, dtnow.Minute, dtnow.Second);
                     bossViewModel.LastTime = res;
+                    hist.Type = "Ткнул упал сейчас";
                 }
                 else
                 {
@@ -122,9 +138,13 @@ namespace FirstProject.Controllers
                     str = str.Remove(str.Length - 1);
                     bossViewModel.LastTime = mass[0] + ' ' + str.Replace('.', ':').Replace(',', ':').Replace('-', ':')
                         .Replace(' ', ':');
+                    hist.Type = "Ткнул точное время";
                 }
 
+                hist.LastTime = bossViewModel.LastTime;
+                hist.BossName = bossViewModel.Name;
                 db.Entry(bossViewModel).State = EntityState.Modified;
+                db.History.Add(hist);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

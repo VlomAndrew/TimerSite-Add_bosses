@@ -26,9 +26,11 @@
                             @Html.HiddenFor(model => model.KdTime)
                             @Html.ValidationMessageFor(model => model.KdTime, "", new {@class = "text-danger"})
                      
+                @Html.HiddenFor(model => model.Color)
+                @Html.ValidationMessageFor(model => model.Color, "", new {@class = "text-danger"})
 
                     
-                            @Html.HiddenFor(model => model.KdCount)
+                @Html.HiddenFor(model => model.KdCount)
                             @Html.ValidationMessageFor(model => model.KdCount, "", new {@class = "text-danger"})
                     
                     
